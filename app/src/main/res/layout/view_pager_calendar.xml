@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <!-- layout_width=296dp, layout_height=344dp -->
+
+    <TextView
+        android:id="@+id/text_year_and_month"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        android:textColor="#444444"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="March 2021" />
+
+    <TextView
+        android:id="@+id/text_sunday"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:textColor="#444444"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@+id/text_monday"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_year_and_month"
+        tools:text="日" />
+
+    <TextView
+        android:id="@+id/text_monday"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:textColor="#444444"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@+id/text_tuesday"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/text_sunday"
+        app:layout_constraintTop_toTopOf="@+id/text_sunday"
+        tools:text="一" />
+
+    <TextView
+        android:id="@+id/text_tuesday"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:textColor="#444444"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@+id/text_wednesday"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/text_monday"
+        app:layout_constraintTop_toTopOf="@+id/text_sunday"
+        tools:text="二" />
+
+    <TextView
+        android:id="@+id/text_wednesday"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:textColor="#444444"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@+id/text_thursday"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/text_tuesday"
+        app:layout_constraintTop_toTopOf="@+id/text_sunday"
+        tools:text="三" />
+
+    <TextView
+        android:id="@+id/text_thursday"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:textColor="#444444"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@+id/text_friday"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/text_wednesday"
+        app:layout_constraintTop_toTopOf="@+id/text_sunday"
+        tools:text="四" />
+
+    <TextView
+        android:id="@+id/text_friday"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:textColor="#444444"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@+id/text_saturday"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/text_thursday"
+        app:layout_constraintTop_toTopOf="@+id/text_sunday"
+        tools:text="五" />
+
+    <TextView
+        android:id="@+id/text_saturday"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="12dp"
+        android:gravity="center"
+        android:textColor="#444444"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/text_friday"
+        app:layout_constraintTop_toTopOf="@+id/text_sunday"
+        tools:text="六" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_calendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_sunday"
+        app:spanCount="7"
+        tools:itemCount="40"
+        tools:listitem="@layout/item_calendar_week_title" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

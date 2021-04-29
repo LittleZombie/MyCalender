@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="40dp"
+    android:layout_height="40dp">
+
+    <TextView
+        android:id="@+id/text_day"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        tools:background="@drawable/bg_calendar_solid"
+        tools:text="23"
+        tools:textColor="@color/white" />
+
+    <ImageView
+        android:id="@+id/view_dot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="6dp"
+        android:src="@drawable/ic_dot"
+        android:visibility="gone"
+        tools:tint="@color/white"
+        tools:visibility="visible" />
+
+</FrameLayout>
