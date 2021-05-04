@@ -1,6 +1,5 @@
 package com.test.mycalender
 
-import android.util.Log
 import android.view.ViewGroup
 import com.test.h2.BaseRecyclerViewAdapter
 import com.test.h2.BaseRecyclerViewHolder
@@ -35,7 +34,6 @@ class H2CalendarRecyclerViewAdapter(private val listener: OnH2CalendarListener) 
     }
 
     override fun onBind(viewHolder: BaseRecyclerViewHolder<H2CalendarListItem>, position: Int) {
-        Log.d("my_test", "onBind")
         getItem(position)?.let {
             if (H2CalendarListItem.Type.DAY_ITEM == it.type) {
                 (viewHolder as H2CalendarDayItemViewHolder).apply {

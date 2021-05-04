@@ -14,13 +14,15 @@ import kotlinx.android.synthetic.main.item_calendar_day.view.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-class H2CalendarDayItemViewHolder(parent: ViewGroup,
-                                  private val listener: H2CalendarRecyclerViewAdapter.OnH2CalendarListener) :
+class H2CalendarDayItemViewHolder(
+    parent: ViewGroup,
+    private val listener: H2CalendarRecyclerViewAdapter.OnH2CalendarListener
+) :
     BaseRecyclerViewHolder<H2CalendarListItem>(R.layout.item_calendar_day, parent) {
 
     private var dateList: ArrayList<Date>? = null
     private var selectedDate: Date? = null
-    private var itemDate: Date? = null
+    private var dayItem: H2CalendarDayItem? = null
 
     init {
         itemView.setOnClickListener { onDateClicked() }
@@ -36,25 +38,30 @@ class H2CalendarDayItemViewHolder(parent: ViewGroup,
 
     override fun bind(data: H2CalendarListItem) {
         if (data is H2CalendarDayItem) {
-            itemDate = data.date
-            setDayText(data.day)
+            dayItem = data
+            setDayText(data)
             setDateBackground(data.date)
             setDot(data.date)
         }
     }
 
     private fun isSelectedDate(): Boolean {
-        return selectedDate != null && itemDate != null && selectedDate == itemDate
+        return selectedDate != null && selectedDate == dayItem?.date
     }
 
-    private fun setDayText(day: Int) {
+    private fun setDayText(dayItem: H2CalendarDayItem) {
         with(itemView.text_day) {
-            text = day.toString()
-            setTextColor(ContextCompat.getColor(context, if (isSelectedDate()) {
-                R.color.white
-            } else {
-                R.color.text_black
-            }))
+            text = dayItem.day.toString()
+            setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    when {
+                        !dayItem.isClickable -> R.color.gray
+                        isSelectedDate() -> R.color.white
+                        else -> R.color.text_black
+                    }
+                )
+            )
         }
     }
 
@@ -69,8 +76,11 @@ class H2CalendarDayItemViewHolder(parent: ViewGroup,
                 } else {
                     R.color.green
                 }
-                ImageViewCompat.setImageTintList(this, ColorStateList.valueOf(
-                    ContextCompat.getColor(context, color)))
+                ImageViewCompat.setImageTintList(
+                    this, ColorStateList.valueOf(
+                        ContextCompat.getColor(context, color)
+                    )
+                )
             }
         }
     }
@@ -84,8 +94,10 @@ class H2CalendarDayItemViewHolder(parent: ViewGroup,
     }
 
     private fun onDateClicked() {
-        itemDate?.run {
-            listener.onDayClicked(this)
+        dayItem?.run {
+            if (isClickable) {
+                listener.onDayClicked(selectedDate = date)
+            }
         }
     }
 

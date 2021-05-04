@@ -1,7 +1,6 @@
 package com.test.mycalender.viewholder
 
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
@@ -62,10 +61,6 @@ class CalendarViewHolder(
     }
 
     private fun setRecyclerView(itemView: View, calendarModel: H2CalendarModel) {
-        Log.i(
-            "my_test",
-            "setRecyclerView [${calendarModel.year}/${calendarModel.calendarMonth + 1}]"
-        )
         calendarRecyclerViewAdapter.clearItems()
         calendarRecyclerViewAdapter.addItems(calendarModel.days)
 

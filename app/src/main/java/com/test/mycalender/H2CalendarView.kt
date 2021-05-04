@@ -1,7 +1,6 @@
 package com.test.mycalender
 
 import android.content.Context
-import android.text.format.DateUtils
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.test.mycalender.viewpager.H2CalendarPagerAdapter
 import kotlinx.android.synthetic.main.view_h2_calendar.view.*
 import java.util.*
-import kotlin.collections.ArrayList
 
 class H2CalendarView @JvmOverloads constructor(
     context: Context,
@@ -20,7 +18,10 @@ class H2CalendarView @JvmOverloads constructor(
     H2CalendarRecyclerViewAdapter.OnH2CalendarListener {
 
     private val pagerAdapter: H2CalendarPagerAdapter = H2CalendarPagerAdapter(this).apply {
-        setItems(H2CalendarHelper.createCalendarData())
+        setItems(H2CalendarHelper.createCalendarData(minCalendar = Calendar.getInstance().apply {
+            set(Calendar.YEAR, 2020)
+            set(Calendar.MONTH, Calendar.NOVEMBER)
+        }))
     }
     private var selectedDate = Date()
 
@@ -42,32 +43,59 @@ class H2CalendarView @JvmOverloads constructor(
         this.selectedDate = selectedDate
         pagerAdapter.setSelectedDate(selectedDate)
 
-        text_today.text = DateUtils.formatDateTime(
-            text_today.context, selectedDate.time,
-            DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR
-                    or DateUtils.FORMAT_SHOW_WEEKDAY
-        )
+        text_month_day.text = H2CalendarHelper.getMonthDay(selectedDate)
+        text_year.text = H2CalendarHelper.getYear(selectedDate)
     }
 
     private fun initCalendarView() {
-        view_pager.adapter = pagerAdapter
-        view_pager.currentItem = pagerAdapter.itemCount - 1
-        view_pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                setArrowView(position)
-            }
-
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                //TODO LEE: arrow
-            }
-        })
+        setViewPager()
         setArrowView(view_pager.currentItem)
+        setDateTextView()
+        setClickListener()
+    }
+
+    private fun setViewPager() {
+        with(view_pager) {
+            adapter = pagerAdapter
+            setCurrentItem(getMaxPagePosition(), false)
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    setArrowView(position)
+                }
+            })
+        }
+    }
+
+    private fun setArrowView(currentPosition: Int) {
+        when {
+            currentPosition <= 0 -> {
+                image_arrow_previous.visibility = View.INVISIBLE
+                image_arrow_next.visibility = View.VISIBLE
+            }
+            currentPosition >= getMaxPagePosition() -> {
+                image_arrow_previous.visibility = View.VISIBLE
+                image_arrow_next.visibility = View.INVISIBLE
+            }
+            else -> {
+                image_arrow_previous.visibility = View.VISIBLE
+                image_arrow_next.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun setDateTextView() {
+        text_year.text = H2CalendarHelper.getYear(selectedDate)
+        text_month_day.text = H2CalendarHelper.getMonthDay(selectedDate)
+    }
+
+    private fun setClickListener() {
+        text_year.setOnClickListener {
+            // todo lee: show year list
+        }
+        text_month_day.setOnClickListener {
+            // todo lee: show month calendar
+        }
         image_arrow_previous.setOnClickListener { onArrowClicked(PREVIOUS) }
         image_arrow_next.setOnClickListener { onArrowClicked(NEXT) }
     }
@@ -85,21 +113,8 @@ class H2CalendarView @JvmOverloads constructor(
         }
     }
 
-    private fun setArrowView(currentPosition: Int) {
-        when {
-            currentPosition <= 0 -> {
-                image_arrow_previous.visibility = View.GONE
-                image_arrow_next.visibility = View.VISIBLE
-            }
-            currentPosition >= pagerAdapter.itemCount - 1 -> {
-                image_arrow_previous.visibility = View.VISIBLE
-                image_arrow_next.visibility = View.GONE
-            }
-            else -> {
-                image_arrow_previous.visibility = View.VISIBLE
-                image_arrow_next.visibility = View.VISIBLE
-            }
-        }
+    private fun getMaxPagePosition(): Int {
+        return pagerAdapter.itemCount - 1
     }
 
 }

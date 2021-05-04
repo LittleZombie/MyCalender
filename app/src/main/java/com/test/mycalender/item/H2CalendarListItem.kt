@@ -10,7 +10,6 @@ open class H2CalendarListItem(val type: Int) {
     }
 }
 
-class H2CalendarDayItem(val day: Int, val date: Date): H2CalendarListItem(Type.DAY_ITEM) {
-}
+class H2CalendarDayItem(val day: Int, val date: Date, val isClickable: Boolean): H2CalendarListItem(Type.DAY_ITEM)
 
 class H2CalendarEmptyItem: H2CalendarListItem(Type.EMPTY_ITEM)
