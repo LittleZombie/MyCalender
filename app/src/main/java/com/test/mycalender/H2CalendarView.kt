@@ -90,14 +90,26 @@ class H2CalendarView @JvmOverloads constructor(
     }
 
     private fun setClickListener() {
-        text_year.setOnClickListener {
-            // todo lee: show year list
-        }
-        text_month_day.setOnClickListener {
-            // todo lee: show month calendar
-        }
+        text_year.setOnClickListener { showYearList() }
+        text_month_day.setOnClickListener { showCalendarView() }
         image_arrow_previous.setOnClickListener { onArrowClicked(PREVIOUS) }
         image_arrow_next.setOnClickListener { onArrowClicked(NEXT) }
+    }
+
+    private fun showYearList() {
+        recycler_view_year.visibility = View.VISIBLE
+
+        view_pager.visibility = View.GONE
+        image_arrow_previous.visibility = View.GONE
+        image_arrow_next.visibility = View.GONE
+    }
+
+    private fun showCalendarView() {
+        recycler_view_year.visibility = View.GONE
+
+        view_pager.visibility = View.VISIBLE
+        image_arrow_previous.visibility = View.VISIBLE
+        image_arrow_next.visibility = View.VISIBLE
     }
 
     private fun onArrowClicked(type: Int) {
