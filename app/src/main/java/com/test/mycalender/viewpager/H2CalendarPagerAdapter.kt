@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import com.test.h2.BaseRecyclerViewAdapter
 import com.test.h2.BaseRecyclerViewHolder
 import com.test.mycalender.H2CalendarHelper
-import com.test.mycalender.H2CalendarRecyclerViewAdapter
+import com.test.mycalender.adapter.H2CalendarRecyclerViewAdapter
 import com.test.mycalender.item.H2CalendarModel
 import com.test.mycalender.viewholder.CalendarViewHolder
 import java.util.*
@@ -36,10 +36,10 @@ class H2CalendarPagerAdapter(private val listener: H2CalendarRecyclerViewAdapter
     override fun onBind(viewHolder: BaseRecyclerViewHolder<H2CalendarModel>, position: Int) {
         getItem(position)?.run {
             (viewHolder as CalendarViewHolder).apply {
-                dateList?.let { viewHolder.setEventDates(it) }
-                selectedDate?.let { viewHolder.setSelectedDate(it) }
-                bind(this@run)
+                dateList?.let { setEventDates(it) }
+                selectedDate?.let { setSelectedDate(it) }
             }
+            viewHolder.bind(this)
         }
     }
 

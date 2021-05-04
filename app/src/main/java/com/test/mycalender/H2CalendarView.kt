@@ -5,7 +5,11 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
+import com.test.mycalender.adapter.H2CalendarRecyclerViewAdapter
+import com.test.mycalender.adapter.SelectYearAdapter
+import com.test.mycalender.item.H2CalendarModel
 import com.test.mycalender.viewpager.H2CalendarPagerAdapter
 import kotlinx.android.synthetic.main.view_h2_calendar.view.*
 import java.util.*
@@ -15,14 +19,12 @@ class H2CalendarView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr),
-    H2CalendarRecyclerViewAdapter.OnH2CalendarListener {
+    H2CalendarRecyclerViewAdapter.OnH2CalendarListener, SelectYearAdapter.OnYearListener {
 
-    private val pagerAdapter: H2CalendarPagerAdapter = H2CalendarPagerAdapter(this).apply {
-        setItems(H2CalendarHelper.createCalendarData(minCalendar = Calendar.getInstance().apply {
-            set(Calendar.YEAR, 2020)
-            set(Calendar.MONTH, Calendar.NOVEMBER)
-        }))
-    }
+    private val selectYearAdapter = SelectYearAdapter(this)
+    private val pagerAdapter = H2CalendarPagerAdapter(this)
+    private var calendarModelList: ArrayList<H2CalendarModel> = arrayListOf()
+    private var yearList: ArrayList<Int> = arrayListOf()
     private var selectedDate = Date()
 
     companion object {
@@ -31,6 +33,10 @@ class H2CalendarView @JvmOverloads constructor(
     }
 
     init {
+        val pairData = H2CalendarHelper.createCalendarData()
+        calendarModelList = pairData.first
+        yearList = pairData.second
+
         LayoutInflater.from(context).inflate(R.layout.view_h2_calendar, this, true)
         initCalendarView()
     }
@@ -47,17 +53,39 @@ class H2CalendarView @JvmOverloads constructor(
         text_year.text = H2CalendarHelper.getYear(selectedDate)
     }
 
+
+    override fun onYearSelected(year: Int) {
+        val calendar = Calendar.getInstance().apply {
+            time = selectedDate
+            set(Calendar.YEAR, year)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.SECOND, 0)
+        }
+        calendarModelList.indexOfFirst {
+            it.year == year && it.calendarMonth == calendar.get(Calendar.MONTH)
+        }.let { pagePosition ->
+            setPage(pagePosition)
+        }
+        onDayClicked(calendar.time)
+        showCalendarView()
+    }
+
     private fun initCalendarView() {
-        setViewPager()
+        setCalendarViewPager()
+        setYearRecyclerView()
+        showCalendarView()
         setArrowView(view_pager.currentItem)
         setDateTextView()
         setClickListener()
     }
 
-    private fun setViewPager() {
+    private fun setCalendarViewPager() {
         with(view_pager) {
-            adapter = pagerAdapter
-            setCurrentItem(getMaxPagePosition(), false)
+            adapter = pagerAdapter.apply {
+                setItems(calendarModelList)
+            }
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
@@ -65,6 +93,17 @@ class H2CalendarView @JvmOverloads constructor(
                 }
             })
         }
+        setPage(getMaxPagePosition())
+    }
+
+    private fun setPage(position: Int) {
+        view_pager.setCurrentItem(position, false)
+    }
+
+    private fun setYearRecyclerView() {
+        selectYearAdapter.setItems(yearList)
+        recycler_view_year.adapter = selectYearAdapter
+        recycler_view_year.layoutManager = LinearLayoutManager(context)
     }
 
     private fun setArrowView(currentPosition: Int) {

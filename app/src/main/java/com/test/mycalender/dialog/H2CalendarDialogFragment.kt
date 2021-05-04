@@ -59,6 +59,16 @@ class H2CalendarDialogFragment : DialogFragment() {
             ?.let {
                 calendar_view.setEventDates(it as ArrayList<Date>)
             }
+
+        text_latest.setOnClickListener {
+            dismiss()
+        }
+        text_confirm.setOnClickListener {
+            dismiss()
+        }
+        text_cancel.setOnClickListener {
+            dismiss()
+        }
     }
 
 

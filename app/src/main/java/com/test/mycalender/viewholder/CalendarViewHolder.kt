@@ -1,11 +1,11 @@
 package com.test.mycalender.viewholder
 
-import android.text.format.DateUtils
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import com.test.h2.BaseRecyclerViewHolder
-import com.test.mycalender.H2CalendarRecyclerViewAdapter
+import com.test.mycalender.H2CalendarHelper
+import com.test.mycalender.adapter.H2CalendarRecyclerViewAdapter
 import com.test.mycalender.R
 import com.test.mycalender.item.H2CalendarModel
 import kotlinx.android.synthetic.main.view_pager_calendar.view.*
@@ -22,12 +22,10 @@ class CalendarViewHolder(
 
     fun setEventDates(dateList: ArrayList<Date>) {
         calendarRecyclerViewAdapter.setEventDates(dateList)
-        calendarRecyclerViewAdapter.notifyDataSetChanged()
     }
 
     fun setSelectedDate(selectedDate: Date) {
         calendarRecyclerViewAdapter.setSelectedDate(selectedDate)
-        calendarRecyclerViewAdapter.notifyDataSetChanged()
     }
 
     override fun bind(data: H2CalendarModel) {
@@ -37,15 +35,8 @@ class CalendarViewHolder(
     }
 
     private fun setYearWithMonthText(itemView: View, calendarModel: H2CalendarModel) {
-        val flags: Int =
-            DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_NO_MONTH_DAY or DateUtils.FORMAT_SHOW_YEAR
-        val millis: Long = Calendar.getInstance().apply {
-            set(Calendar.YEAR, calendarModel.year)
-            set(Calendar.MONTH, calendarModel.calendarMonth)
-            set(Calendar.DATE, 1)
-        }.time.time
-        itemView.text_year_and_month.text =
-            DateUtils.formatDateRange(itemView.context, millis, millis, flags)
+        itemView.text_year_and_month.text = H2CalendarHelper
+            .getYearMonth(itemView.context, calendarModel.getMillis())
     }
 
     private fun setWeekOfDaysText(itemView: View) {

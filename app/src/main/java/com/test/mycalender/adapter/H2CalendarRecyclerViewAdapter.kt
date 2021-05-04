@@ -1,4 +1,4 @@
-package com.test.mycalender
+package com.test.mycalender.adapter
 
 import android.view.ViewGroup
 import com.test.h2.BaseRecyclerViewAdapter
@@ -16,10 +16,12 @@ class H2CalendarRecyclerViewAdapter(private val listener: OnH2CalendarListener) 
 
     fun setEventDates(dateList: ArrayList<Date>) {
         this.dateList = dateList
+        notifyDataSetChanged()
     }
 
     fun setSelectedDate(selectedDate: Date) {
         this.selectedDate = selectedDate
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(
@@ -39,11 +41,9 @@ class H2CalendarRecyclerViewAdapter(private val listener: OnH2CalendarListener) 
                 (viewHolder as H2CalendarDayItemViewHolder).apply {
                     dateList?.run { setEventDates(this) }
                     selectedDate?.run { setSelectedDate(this) }
-                    bind(it)
                 }
-            } else {
-                viewHolder.bind(it)
             }
+            viewHolder.bind(it)
         }
     }
 
