@@ -5,8 +5,11 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
+import com.test.mycalender.H2CalendarHelper.toMaxHourMinutes
+import com.test.mycalender.H2CalendarHelper.toMinHourMinutes
 import com.test.mycalender.adapter.H2CalendarRecyclerViewAdapter
 import com.test.mycalender.adapter.SelectYearAdapter
 import com.test.mycalender.item.H2CalendarModel
@@ -21,11 +24,14 @@ class H2CalendarView @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyleAttr),
     H2CalendarRecyclerViewAdapter.OnH2CalendarListener, SelectYearAdapter.OnYearListener {
 
+    var selectedDate = Date()
+        private set
     private val selectYearAdapter = SelectYearAdapter(this)
     private val pagerAdapter = H2CalendarPagerAdapter(this)
     private var calendarModelList: ArrayList<H2CalendarModel> = arrayListOf()
     private var yearList: ArrayList<Int> = arrayListOf()
-    private var selectedDate = Date()
+    private var minCalendar: Calendar = H2CalendarHelper.getMinCalendar()
+    private var maxCalendar: Calendar = H2CalendarHelper.getMaxCalendar()
 
     companion object {
         private const val PREVIOUS = -1
@@ -33,43 +39,77 @@ class H2CalendarView @JvmOverloads constructor(
     }
 
     init {
-        val pairData = H2CalendarHelper.createCalendarData()
-        calendarModelList = pairData.first
-        yearList = pairData.second
-
         LayoutInflater.from(context).inflate(R.layout.view_h2_calendar, this, true)
-        initCalendarView()
+    }
+
+    fun setMinCalendar(minCalendar: Calendar) {
+        this.minCalendar = minCalendar.apply {
+            toMinHourMinutes()
+        }
+    }
+
+    fun setMaxCalendar(maxCalendar: Calendar) {
+        this.maxCalendar = maxCalendar.apply {
+            toMaxHourMinutes()
+        }
     }
 
     fun setEventDates(dateList: ArrayList<Date>) {
-        pagerAdapter.setEventDates(dateList)
+        this.pagerAdapter.setEventDates(dateList)
     }
 
-    override fun onDayClicked(selectedDate: Date) {
+    fun setSelectedDate(selectedDate: Date) {
         this.selectedDate = selectedDate
-        pagerAdapter.setSelectedDate(selectedDate)
+    }
 
+    fun initView() {
+        val pairData: Pair<ArrayList<H2CalendarModel>, ArrayList<Int> /* year */> =
+            H2CalendarHelper.createCalendarData(
+                minCalendar = minCalendar,
+                maxCalendar = maxCalendar
+            )
+        calendarModelList = pairData.first
+        yearList = pairData.second
+        initCalendarView()
+    }
+
+    override fun onDaySelected(selectedDate: Date, isScrollToCurrentPage: Boolean) {
+        this.selectedDate = Calendar.getInstance().apply {
+            time = selectedDate
+            toMinHourMinutes()
+        }.time
+
+        selectYearAdapter.setSelectedYear(getSelectedYear())
+        pagerAdapter.setSelectedDate(selectedDate)
         text_month_day.text = H2CalendarHelper.getMonthDay(selectedDate)
         text_year.text = H2CalendarHelper.getYear(selectedDate)
+        if (isScrollToCurrentPage) {
+            scrollToPage(year = getSelectedYear(), calendarMonth = getSelectedMonth())
+        }
     }
 
-
     override fun onYearSelected(year: Int) {
-        val calendar = Calendar.getInstance().apply {
+        val calendar: Calendar = Calendar.getInstance().apply {
             time = selectedDate
             set(Calendar.YEAR, year)
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.SECOND, 0)
+            toMinHourMinutes()
         }
+        if (calendar.time > maxCalendar.time) {
+            calendar.time = maxCalendar.time
+        } else if (calendar.time < minCalendar.time) {
+            calendar.time = minCalendar.time
+        }
+        scrollToPage(year = year, calendarMonth = calendar.get(Calendar.MONTH))
+        onDaySelected(selectedDate = calendar.time)
+        showCalendarView()
+    }
+
+    private fun scrollToPage(year: Int, calendarMonth: Int) {
         calendarModelList.indexOfFirst {
-            it.year == year && it.calendarMonth == calendar.get(Calendar.MONTH)
+            it.year == year && it.calendarMonth == calendarMonth
         }.let { pagePosition ->
             setPage(pagePosition)
         }
-        onDayClicked(calendar.time)
-        showCalendarView()
     }
 
     private fun initCalendarView() {
@@ -85,6 +125,7 @@ class H2CalendarView @JvmOverloads constructor(
         with(view_pager) {
             adapter = pagerAdapter.apply {
                 setItems(calendarModelList)
+                setSelectedDate(selectedDate)
             }
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
@@ -102,7 +143,10 @@ class H2CalendarView @JvmOverloads constructor(
 
     private fun setYearRecyclerView() {
         selectYearAdapter.setItems(yearList)
-        recycler_view_year.adapter = selectYearAdapter
+        recycler_view_year.adapter = selectYearAdapter.apply {
+            setItems(yearList)
+            setSelectedYear(getSelectedYear())
+        }
         recycler_view_year.layoutManager = LinearLayoutManager(context)
     }
 
@@ -137,18 +181,45 @@ class H2CalendarView @JvmOverloads constructor(
 
     private fun showYearList() {
         recycler_view_year.visibility = View.VISIBLE
-
         view_pager.visibility = View.GONE
         image_arrow_previous.visibility = View.GONE
         image_arrow_next.visibility = View.GONE
+        scrollToCurrentYear()
+        setYearAndDateTextColor()
     }
 
     private fun showCalendarView() {
         recycler_view_year.visibility = View.GONE
-
         view_pager.visibility = View.VISIBLE
         image_arrow_previous.visibility = View.VISIBLE
         image_arrow_next.visibility = View.VISIBLE
+        scrollToCurrentMonth()
+        setYearAndDateTextColor()
+    }
+
+    private fun scrollToCurrentMonth() {
+        val position: Int = calendarModelList.indexOfFirst {
+            it.year == getSelectedYear() && it.calendarMonth == getSelectedMonth()
+        }
+        setPage(position)
+    }
+
+    private fun scrollToCurrentYear() {
+        val currentYear: Int = getSelectedYear()
+        val position: Int = yearList.indexOf(currentYear)
+        recycler_view_year.scrollToPosition(position)
+    }
+
+    private fun setYearAndDateTextColor() {
+        val white = ContextCompat.getColor(context, R.color.white)
+        val alphaWhite = ContextCompat.getColor(context, R.color.white_200)
+        if (recycler_view_year.isShown) {
+            text_year.setTextColor(white)
+            text_month_day.setTextColor(alphaWhite)
+        } else {
+            text_year.setTextColor(alphaWhite)
+            text_month_day.setTextColor(white)
+        }
     }
 
     private fun onArrowClicked(type: Int) {
@@ -161,6 +232,16 @@ class H2CalendarView @JvmOverloads constructor(
             goToPage.invoke(position)
         } else if (NEXT == type && position < pagerAdapter.itemCount) {
             goToPage.invoke(position)
+        }
+    }
+
+    private fun getSelectedYear(): Int = getSelectedCalendar().get(Calendar.YEAR)
+
+    private fun getSelectedMonth(): Int = getSelectedCalendar().get(Calendar.MONTH)
+
+    private fun getSelectedCalendar(): Calendar {
+        return Calendar.getInstance().apply {
+            time = selectedDate
         }
     }
 

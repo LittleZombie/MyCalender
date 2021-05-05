@@ -11,6 +11,13 @@
         android:id="@+id/button_calendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Calendar"/>
+        android:text="Calendar" />
+
+    <TextView
+        android:id="@+id/text_selected_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
 
 </LinearLayout>

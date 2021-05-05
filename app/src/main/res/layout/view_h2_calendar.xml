@@ -89,8 +89,13 @@
         android:id="@+id/recycler_view_year"
         android:layout_width="304dp"
         android:layout_height="344dp"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_text_background" />
+        app:layout_constraintTop_toBottomOf="@+id/view_text_background"
+        tools:itemCount="5"
+        tools:listitem="@layout/item_year"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

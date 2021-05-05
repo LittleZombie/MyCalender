@@ -8,7 +8,6 @@ import com.test.mycalender.item.H2CalendarDayItem
 import com.test.mycalender.item.H2CalendarEmptyItem
 import com.test.mycalender.item.H2CalendarListItem
 import com.test.mycalender.item.H2CalendarModel
-import kotlinx.android.synthetic.main.view_pager_calendar.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -19,9 +18,36 @@ object H2CalendarHelper {
     private const val PATTERN_MONTH_DAY = "EMMMd"
     private const val PATTERN_SHORT_WEEK_DAY = "EEEEE"
 
+    fun Calendar.toMinHourMinutes() {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+
+    fun Calendar.toMaxHourMinutes() {
+        set(Calendar.HOUR_OF_DAY, 23)
+        set(Calendar.MINUTE, 59)
+        set(Calendar.SECOND, 59)
+        set(Calendar.MILLISECOND, 999)
+    }
+
+    fun getMaxCalendar(): Calendar {
+        return Calendar.getInstance().apply { toMaxHourMinutes() }
+    }
+
+    fun getMinCalendar(): Calendar {
+        return Calendar.getInstance().apply {
+            set(Calendar.YEAR, 2000)
+            set(Calendar.MONTH, Calendar.JANUARY)
+            set(Calendar.DATE, 1)
+            toMinHourMinutes()
+        }
+    }
+
     fun createCalendarData(
-        minCalendar: Calendar = getMinCalendar(),
-        maxCalendar: Calendar = getMaxCalendar()
+        minCalendar: Calendar,
+        maxCalendar: Calendar
     ): Pair<ArrayList<H2CalendarModel>, ArrayList<Int>> {
 
         val current: Calendar = Calendar.getInstance()
@@ -95,17 +121,14 @@ object H2CalendarHelper {
                 set(Calendar.YEAR, year)
                 set(Calendar.MONTH, calendarMonth)
                 set(Calendar.DATE, day)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.SECOND, 0)
+                toMinHourMinutes()
             }.time
 
             dayList.add(
                 H2CalendarDayItem(
                     day = day,
                     date = date,
-                    isClickable = date.before(maxDate) && date.after(minDate)
+                    isClickable = date.time >= minDate.time && date.time < maxDate.time
                 )
             )
         }
@@ -136,27 +159,6 @@ object H2CalendarHelper {
             Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY,
             Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY
         )
-    }
-
-    private fun getMaxCalendar(): Calendar {
-        return Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 23)
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
-            set(Calendar.SECOND, 999)
-        }
-    }
-
-    private fun getMinCalendar(): Calendar {
-        return Calendar.getInstance().apply {
-            set(Calendar.YEAR, 2000)
-            set(Calendar.MONTH, Calendar.JANUARY)
-            set(Calendar.DATE, 1)
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.SECOND, 0)
-        }
     }
 
     private fun getCalendarMonths(): ArrayList<Int> {

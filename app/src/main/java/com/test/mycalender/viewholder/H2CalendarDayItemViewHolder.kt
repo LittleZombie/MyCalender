@@ -1,19 +1,17 @@
 package com.test.mycalender.viewholder
 
 import android.content.res.ColorStateList
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import com.test.h2.BaseRecyclerViewHolder
-import com.test.mycalender.adapter.H2CalendarRecyclerViewAdapter
 import com.test.mycalender.R
+import com.test.mycalender.adapter.H2CalendarRecyclerViewAdapter
 import com.test.mycalender.item.H2CalendarDayItem
 import com.test.mycalender.item.H2CalendarListItem
 import kotlinx.android.synthetic.main.item_calendar_day.view.*
 import java.util.*
-import kotlin.collections.ArrayList
 
 class H2CalendarDayItemViewHolder(
     parent: ViewGroup,
@@ -35,7 +33,6 @@ class H2CalendarDayItemViewHolder(
 
     fun setSelectedDate(selectedDate: Date) {
         this.selectedDate = selectedDate
-        Log.d("my_test", "H2CalendarDayItemViewHolder setSelectedDate: $selectedDate")
     }
 
     override fun bind(data: H2CalendarListItem) {
@@ -84,26 +81,27 @@ class H2CalendarDayItemViewHolder(
     }
 
     private fun setDateBackground(date: Date) {
-        Log.d("my_test", "setDateBackground")
         when {
-            isSelectedDate() -> {
-                itemView.text_day.setBackgroundResource(R.drawable.bg_calendar_solid)
-                Log.d("my_test", "[true] $date")
-            }
+            isSelectedDate() -> itemView.text_day.setBackgroundResource(R.drawable.bg_calendar_solid)
             isToday(date) -> itemView.text_day.setBackgroundResource(R.drawable.bg_calendar_stroke)
             else -> itemView.text_day.background = null
         }
     }
 
     private fun isSelectedDate(): Boolean {
-        Log.e("my_test", "selectedDate=$selectedDate, dayItem?.date=${dayItem?.date}")
-        return selectedDate != null && selectedDate == dayItem?.date
+        val date = selectedDate
+        val itemDate = dayItem?.date
+        return if (date != null && itemDate != null) {
+            isTheSameDay(date, itemDate)
+        } else {
+            false
+        }
     }
 
     private fun onDateClicked() {
         dayItem?.run {
             if (isClickable) {
-                listener.onDayClicked(selectedDate = date)
+                listener.onDaySelected(selectedDate = date)
             }
         }
     }

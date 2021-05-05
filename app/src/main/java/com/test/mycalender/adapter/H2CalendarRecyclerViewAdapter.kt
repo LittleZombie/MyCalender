@@ -52,6 +52,6 @@ class H2CalendarRecyclerViewAdapter(private val listener: OnH2CalendarListener) 
     }
 
     interface OnH2CalendarListener {
-        fun onDayClicked(selectedDate: Date)
+        fun onDaySelected(selectedDate: Date, isScrollToCurrentPage: Boolean = false)
     }
 }
